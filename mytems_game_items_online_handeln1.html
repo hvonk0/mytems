@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTems - Game Items Online Handeln</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;600;700&family=VT323&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        mytemsBlue: '#1a4bb8',
+                        mytemsOrange: '#e05a47',
+                        mydrugsPink: '#ff0055',
+                        mydrugsGreen: '#00ff66',
+                        darkBg: '#0d0e12',
+                        cardBg: '#161922'
+                    },
+                    fontFamily: {
+                        pixel: ['"Press Start 2P"', 'cursive'],
+                        tech: ['Rajdhani', 'sans-serif'],
+                        terminal: ['VT323', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Pixelated grid header background simulation */
+        .pixel-grid {
+            background-color: #d8dfeb;
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+
+        /* Glitch effect for MyDrugs mode transition */
+        .glitch {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+        /* 3D Box Logo Style */
+        .logo-box {
+            background: #1e52cf;
+            box-shadow: -8px 8px 0px #0e2a73, -12px 12px 0px rgba(0,0,0,0.2);
+            transform: rotate(-3deg);
+            transition: all 0.3s ease;
+        }
+
+        .logo-box:hover {
+            transform: rotate(-1deg) scale(1.02);
+        }
+
+        .mydrugs-theme {
+            background-color: #07080a !important;
+            color: #00ff66 !important;
+        }
+
+        .mydrugs-card {
+            background: #11141a;
+            border: 1px solid #1f293d;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.1);
+        }
+
+        .mydrugs-card:hover {
+            border-color: #ff0055;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-tech min-h-screen flex flex-col transition-colors duration-500 selection:bg-mytemsBlue selection:text-white" id="mainBody">
+
+    <!-- TOP ACCENT BAR -->
+    <div id="topAccentBar" class="h-2 bg-mytemsOrange w-full transition-colors duration-500"></div>
+
+    <!-- HEADER / BANNER SECTION -->
+    <header id="headerBanner" class="pixel-grid py-8 px-4 border-b border-gray-300 relative transition-all duration-500">
+        <div class="max-w-7xl mx-auto flex flex-col items-center justify-center text-center relative">
+            
+            <!-- EASTER EGG TOGGLE BUTTON (TOP RIGHT) -->
+            <div class="absolute right-2 top-0 md:right-4 md:top-2 flex items-center gap-2 bg-white/80 dark:bg-black/80 backdrop-blur p-2 rounded-lg border border-gray-300 dark:border-gray-700 shadow-md">
+                <span class="text-xs font-bold text-gray-700 dark:text-gray-300 hidden md:inline" id="modeLabel">Modo Seguro</span>
+                <button id="darknetToggle" onclick="toggleDarknetMode()" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-gray-400" role="switch" aria-checked="false">
+                    <span id="toggleKnob" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
+                </button>
+            </div>
+
+            <!-- LOGO BRANDING -->
+            <div id="logoContainer" class="logo-box px-8 py-3 my-2 inline-block border-2 border-blue-400 cursor-pointer" onclick="resetSearch()">
+                <h1 id="logoText" class="text-4xl md:text-6xl font-black text-white tracking-wider font-pixel drop-shadow-md">
+                    MYTEMS
+                </h1>
+            </div>
+
+            <p id="subTitleText" class="mt-3 text-lg md:text-xl font-bold text-gray-800 tracking-widest uppercase font-pixel">
+                GAME ITEMS ONLINE HANDELN
+            </p>
+            <p id="subTitleQuote" class="text-xs text-gray-600 mt-1 font-mono italic">
+                "A maior plataforma europeia de troca de skins e itens virtuais"
+            </p>
+        </div>
+    </header>
+
+    <!-- NAVIGATION BAR -->
+    <nav id="navBar" class="bg-gray-950 text-gray-300 border-b border-gray-800 sticky top-0 z-30 transition-colors duration-500 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-4 py-2.5">
+            <!-- Game Category Filter Tabs -->
+            <div id="categoryTabs" class="flex items-center space-x-1 overflow-x-auto pb-1 md:pb-0 scrollbar-none w-full md:w-auto">
+                <button onclick="filterCategory('ALL')" class="cat-btn bg-mytemsBlue text-white px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider hover:opacity-90 transition">
+                    TODOS
+                </button>
+                <button onclick="filterCategory('CSGO')" class="cat-btn bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider transition">
+                    CS:GO
+                </button>
+                <button onclick="filterCategory('TF2')" class="cat-btn bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider transition">
+                    TF2
+                </button>
+                <button onclick="filterCategory('PUBG')" class="cat-btn bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider transition">
+                    PUBG
+                </button>
+                <button onclick="filterCategory('RUST')" class="cat-btn bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider transition">
+                    RUST
+                </button>
+                <button onclick="filterCategory('DOTA2')" class="cat-btn bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider transition">
+                    DOTA 2
+                </button>
+            </div>
+
+            <!-- Search Input -->
+            <div class="relative w-full md:w-64">
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Buscar item..." class="w-full bg-gray-900 text-white text-sm rounded border border-gray-700 px-3 py-1.5 pl-8 focus:outline-none focus:border-mytemsBlue transition">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-500 text-xs"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ALERT BANNER FOR MYDRUGS MODE -->
+    <div id="darknetBanner" class="hidden bg-red-950/90 border-b border-red-600 text-red-200 px-4 py-2 text-center text-xs md:text-sm font-mono flex items-center justify-center gap-2 animate-pulse">
+        <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+        <span><strong>MODO CRIPTOGRAFADO ATIVO (MYDRUGS)</strong> — Conexão via rede TOR roteada. Btc Wallet: Connected.</span>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+            <!-- ITEM GRID (3 Columns on Large Screens) -->
+            <section class="lg:col-span-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 id="sectionTitle" class="text-xl font-bold uppercase tracking-wider text-gray-200 flex items-center gap-2">
+                        <i class="fa-solid fa-store text-mytemsBlue" id="sectionIcon"></i>
+                        <span id="sectionTitleText">Itens em Destaque</span>
+                    </h2>
+                    <span id="itemCount" class="text-xs font-mono text-gray-400">Exibindo 8 itens</span>
+                </div>
+
+                <!-- CARDS GRID -->
+                <div id="itemsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Items rendered dynamically via JavaScript -->
+                </div>
+            </section>
+
+            <!-- RIGHT SIDEBAR: CART & STATS -->
+            <aside class="lg:col-span-1 flex flex-col gap-4">
+                
+                <!-- CART PANEL -->
+                <div id="cartPanel" class="bg-gray-950 border border-gray-800 rounded-lg p-4 shadow-xl sticky top-16">
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-3 mb-3">
+                        <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                            <i class="fa-solid fa-cart-shopping text-mytemsBlue" id="cartIcon"></i>
+                            <span>Seu Carrinho</span>
+                        </h3>
+                        <span id="cartBadge" class="bg-mytemsBlue text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+
+                    <!-- Cart List -->
+                    <div id="cartItemsList" class="space-y-3 max-h-64 overflow-y-auto pr-1 mb-4">
+                        <p id="emptyCartText" class="text-gray-500 text-sm text-center py-6 font-mono">
+                            Seu carrinho está vazio.
+                        </p>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="border-t border-gray-800 pt-3 space-y-2">
+                        <div class="flex justify-between text-sm text-gray-400">
+                            <span>Subtotal:</span>
+                            <span id="cartSubtotal" class="font-mono text-white">€ 0,00</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-400">
+                            <span>Taxa de Troca (Crypto/Fiat):</span>
+                            <span class="font-mono text-emerald-400">GRÁTIS</span>
+                        </div>
+                        <div class="flex justify-between text-base font-bold text-white pt-2 border-t border-gray-800">
+                            <span>Total:</span>
+                            <span id="cartTotal" class="font-mono text-mytemsOrange text-lg">€ 0,00</span>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <button id="checkoutBtn" onclick="openCheckoutModal()" disabled class="w-full mt-4 bg-mytemsBlue hover:bg-blue-600 disabled:bg-gray-800 disabled:text-gray-600 text-white font-bold py-2.5 px-4 rounded transition flex items-center justify-center gap-2 shadow-lg">
+                            <i class="fa-solid fa-lock text-xs"></i>
+                            <span>FINALIZAR COMPRA</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SYSTEM STATS / MYDRUGS EASTER EGG INFO -->
+                <div id="infoWidget" class="bg-gray-950/60 border border-gray-800 rounded-lg p-4 text-xs text-gray-400 font-mono space-y-2">
+                    <div class="flex justify-between">
+                        <span>Servidor:</span>
+                        <span class="text-emerald-400">ONLINE (Leipzig-Node)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Criptografia:</span>
+                        <span class="text-blue-400">AES-256-GCM</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Desenvolvedores:</span>
+                        <span class="text-gray-300">M. Zimmermann & L. Schultz</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer id="footer" class="bg-gray-950 border-t border-gray-800 text-gray-500 py-6 px-4 text-center text-xs font-mono mt-12 transition-colors duration-500">
+        <div class="max-w-7xl mx-auto space-y-2">
+            <p>© 2019-2026 MyTems GmbH. Todos os direitos reservados. by hvonk0 (github)".</p>
+            <p class="text-gray-600">Este é um site interativo de homenagem e simulação visual para entretenimento.</p>
+        </div>
+    </footer>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-700 rounded-xl max-w-md w-full p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div id="modalIcon" class="w-12 h-12 bg-blue-500/10 text-mytemsBlue rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                    <i class="fa-brands fa-bitcoin"></i>
+                </div>
+                <h3 id="modalTitle" class="text-xl font-bold text-white">Pagamento Seguro em Crypto</h3>
+                <p id="modalSub" class="text-xs text-gray-400 mt-1">Escrow automatizado garantido por Smart Contracts</p>
+            </div>
+
+            <!-- QR Code and Payment Info -->
+            <div class="bg-gray-950 p-4 rounded-lg border border-gray-800 text-center space-y-3 mb-6">
+                <div class="bg-white p-3 inline-block rounded-lg shadow-inner">
+                    <!-- SVG Generated QR Code Simulation -->
+                    <svg class="w-32 h-32 mx-auto" viewBox="0 0 100 100" fill="black">
+                        <path d="M0,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z M70,0 h30 v30 h-30 z M80,10 h10 v10 h-10 z M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z M40,10 h10 v10 h-10 z M50,40 h20 v10 h-20 z M30,50 h10 v30 h-10 z M70,70 h20 v20 h-20 z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Valor a pagar:</div>
+                    <div id="modalAmount" class="text-xl font-bold text-emerald-400 font-mono">0.0024 BTC (€ 45.00)</div>
+                </div>
+                <div class="text-xs font-mono bg-gray-900 p-2 rounded text-gray-300 break-all select-all border border-gray-800">
+                    bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button onclick="processFakePayment()" id="confirmPayBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2 shadow-lg">
+                <i class="fa-solid fa-check"></i>
+                <span>CONFIRMAR PAGAMENTO</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        /* -------------------------------------------------------------
+           DATA: GAMING ITEMS (MYTEMS NORMAL MODE)
+        ------------------------------------------------------------- */
+        const gamingItems = [
+            {
+                id: 'gt1',
+                name: 'MP9 | Dark Age',
+                category: 'CSGO',
+                priceEUR: 42.50,
+                priceBTC: '0.00072 BTC',
+                desc: 'Time to get medieval on your enemies.',
+                rarity: 'Restricted',
+                color: '#8847ff',
+                // Inline SVG render for realistic game asset icon
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <path d="M10,35 L30,35 L40,25 L75,25 L85,35 L90,30 L95,35 L85,45 L40,45 L30,40 L10,40 Z" fill="#1b4d3e" stroke="#2bf0a5" stroke-width="2"/>
+                        <rect x="25" y="38" width="12" height="18" fill="#111" rx="2"/>
+                        <rect x="55" y="20" width="15" height="6" fill="#333"/>
+                        <circle cx="80" cy="30" r="3" fill="#2bf0a5"/>
+                      </svg>`
+            },
+            {
+                id: 'gt2',
+                name: 'M4A1-S | Control Panel',
+                category: 'CSGO',
+                priceEUR: 88.00,
+                priceBTC: '0.0015 BTC',
+                desc: 'Bomb has been planted.',
+                rarity: 'Classified',
+                color: '#d32ce6',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <path d="M5,30 L25,30 L35,22 L80,22 L85,28 L95,28 L95,32 L85,32 L75,42 L35,42 L25,38 L5,38 Z" fill="#3a3d40" stroke="#ffd700" stroke-width="1.5"/>
+                        <circle cx="85" cy="30" r="12" fill="none" stroke="#00d2ff" stroke-width="2"/>
+                        <rect x="40" y="26" width="20" height="10" fill="#ffd700" opacity="0.8"/>
+                      </svg>`
+            },
+            {
+                id: 'gt3',
+                name: 'Quantum Raygun Mark-II',
+                category: 'TF2',
+                priceEUR: 120.00,
+                priceBTC: '0.0020 BTC',
+                desc: 'Arma energética retro-futurista de alta voltagem.',
+                rarity: 'Exotic',
+                color: '#eb4b4b',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <ellipse cx="75" cy="30" rx="18" ry="18" fill="none" stroke="#00f0ff" stroke-width="2.5"/>
+                        <path d="M15,35 L45,30 L70,30 L75,25 L75,35 L70,30 L45,38 Z" fill="#a0a0a0" stroke="#fff" stroke-width="1.5"/>
+                        <rect x="25" y="34" width="10" height="16" fill="#880000" rx="2" transform="rotate(15 25 34)"/>
+                        <circle cx="75" cy="30" r="6" fill="#00f0ff"/>
+                      </svg>`
+            },
+            {
+                id: 'gt4',
+                name: 'Espada Medieval Excalibur',
+                category: 'RUST',
+                priceEUR: 15.99,
+                priceBTC: '0.00027 BTC',
+                desc: 'Lâmina forjada em aço de alta precisão.',
+                rarity: 'Mil-Spec',
+                color: '#4b69ff',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <path d="M10,10 L85,45 L80,50 L5,15 Z" fill="#c0c0c0" stroke="#ffffff" stroke-width="1"/>
+                        <path d="M15,22 L10,30 L22,25 Z" fill="#e5a93c"/>
+                        <rect x="5" y="10" width="8" height="8" rx="4" fill="#e5a93c"/>
+                      </svg>`
+            },
+            {
+                id: 'gt5',
+                name: 'Level 3 Helmet | Gold Dragon',
+                category: 'PUBG',
+                priceEUR: 64.90,
+                priceBTC: '0.0011 BTC',
+                desc: 'Proteção máxima contra tiros de sniper.',
+                rarity: 'Covert',
+                color: '#eb4b4b',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <path d="M25,45 C25,15 75,15 75,45 L68,48 L32,48 Z" fill="#2a2e3d" stroke="#f59e0b" stroke-width="2"/>
+                        <rect x="35" y="30" width="30" height="6" fill="#111" rx="1"/>
+                        <line x1="30" y1="20" x2="70" y2="20" stroke="#f59e0b" stroke-width="2"/>
+                      </svg>`
+            },
+            {
+                id: 'gt6',
+                name: 'Dragonclaw Hook',
+                category: 'DOTA2',
+                priceEUR: 180.00,
+                priceBTC: '0.0031 BTC',
+                desc: 'Gancho mítico do Pudge forjado em osso de dragão.',
+                rarity: 'Immortal',
+                color: '#e4ae39',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <path d="M20,40 Q40,10 70,20 Q90,30 80,50 Q65,60 55,40" fill="none" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M75,45 L90,55 L70,55 Z" fill="#ef4444"/>
+                      </svg>`
+            }
+        ];
+
+        /* -------------------------------------------------------------
+           DATA: DARKNET ITEMS (MYDRUGS SECRET MODE)
+        ------------------------------------------------------------- */
+        const darknetItems = [
+            {
+                id: 'md1',
+                name: 'MyEtsy Premium Pink MDMA',
+                category: 'EXTASY',
+                priceEUR: 35.00,
+                priceBTC: '0.0006 BTC',
+                desc: 'Pureza 98.4%. Prensado artesanal com logo MyTems.',
+                rarity: 'Pure Quality',
+                color: '#ff0055',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <circle cx="50" cy="30" r="22" fill="#ff0055" stroke="#ffffff" stroke-width="2"/>
+                        <text x="50" y="34" font-family="sans-serif" font-weight="bold" font-size="12" fill="white" text-anchor="middle">MY</text>
+                      </svg>`
+            },
+            {
+                id: 'md2',
+                name: 'Dutch Cristal Meth (Purity A+)',
+                category: 'STIMULANTS',
+                priceEUR: 70.00,
+                priceBTC: '0.0012 BTC',
+                desc: 'Cristais azuis transparentes importados de Rotterdam.',
+                rarity: 'Pharmaceutical',
+                color: '#00f0ff',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <polygon points="50,10 70,30 50,50 30,30" fill="#00d2ff" opacity="0.8" stroke="#ffffff" stroke-width="1.5"/>
+                        <polygon points="50,10 60,30 50,50" fill="#00f0ff"/>
+                      </svg>`
+            },
+            {
+                id: 'md3',
+                name: 'LSD-25 Blotter "Moritz Edition"',
+                category: 'PSYCHEDELICS',
+                priceEUR: 25.00,
+                priceBTC: '0.0004 BTC',
+                desc: '200ug por selo. Arte da cartela inspirada em código binário.',
+                rarity: 'High Grade',
+                color: '#00ff66',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <rect x="30" y="10" width="40" height="40" fill="#222" stroke="#00ff66" stroke-width="2" stroke-dasharray="4"/>
+                        <text x="50" y="33" font-family="monospace" font-size="10" fill="#00ff66" text-anchor="middle">10101</text>
+                      </svg>`
+            },
+            {
+                id: 'md4',
+                name: 'Ketanest S Powder 1g',
+                category: 'DISSOCIATIVES',
+                priceEUR: 45.00,
+                priceBTC: '0.0008 BTC',
+                desc: 'Pó microcristalino de grau laboratorial.',
+                rarity: 'Medical Grade',
+                color: '#a855f7',
+                svg: `<svg viewBox="0 0 100 60" class="w-full h-28 mx-auto drop-shadow-md">
+                        <rect x="35" y="15" width="30" height="30" rx="5" fill="#a855f7" opacity="0.7" stroke="#fff"/>
+                        <circle cx="50" cy="30" r="8" fill="#ffffff" opacity="0.9"/>
+                      </svg>`
+            }
+        ];
+
+        /* -------------------------------------------------------------
+           APP STATE
+        ------------------------------------------------------------- */
+        let isDarknetMode = false;
+        let cart = [];
+        let activeCategory = 'ALL';
+        let currentItems = gamingItems;
+
+        /* -------------------------------------------------------------
+           DOM INITIALIZATION
+        ------------------------------------------------------------- */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderItems();
+            updateCartUI();
+        });
+
+        /* -------------------------------------------------------------
+           RENDER ITEMS
+        ------------------------------------------------------------- */
+        function renderItems() {
+            const container = document.getElementById('itemsContainer');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+
+            // Filter logic
+            let filtered = currentItems.filter(item => {
+                const matchesCat = (activeCategory === 'ALL') || (item.category === activeCategory);
+                const matchesSearch = item.name.toLowerCase().includes(searchVal) || item.desc.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
+            });
+
+            document.getElementById('itemCount').innerText = `Exibindo ${filtered.length} itens`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-500 font-mono">
+                        <i class="fa-solid fa-ghost text-3xl mb-2"></i>
+                        <p>Nenhum item encontrado.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => `
+                <div class="${isDarknetMode ? 'mydrugs-card' : 'bg-gray-950 border-gray-800'} border rounded-lg p-4 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 group">
+                    <div>
+                        <!-- Category / Rarity Tag -->
+                        <div class="flex items-center justify-between text-xs mb-2">
+                            <span class="font-bold px-2 py-0.5 rounded text-gray-900 font-mono" style="background-color: ${item.color}">
+                                ${item.category}
+                            </span>
+                            <span class="text-gray-400 text-xs font-mono">${item.rarity}</span>
+                        </div>
+
+                        <!-- Graphics / SVG Box -->
+                        <div class="bg-gray-900/80 rounded-md p-2 mb-3 border border-gray-800/80 flex items-center justify-center group-hover:bg-gray-900 transition">
+                            ${item.svg}
+                        </div>
+
+                        <!-- Item Title & Desc -->
+                        <h4 class="font-bold text-white text-base group-hover:text-blue-400 transition">
+                            ${item.name}
+                        </h4>
+                        <p class="text-xs text-gray-400 mt-1 line-clamp-2">
+                            ${item.desc}
+                        </p>
+                    </div>
+
+                    <!-- Price & Buy Button -->
+                    <div class="mt-4 pt-3 border-t border-gray-800/60 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs text-gray-500 font-mono">${item.priceBTC}</div>
+                            <div class="text-base font-bold text-emerald-400 font-mono">€ ${item.priceEUR.toFixed(2)}</div>
+                        </div>
+                        <button onclick="addToCart('${item.id}')" class="${isDarknetMode ? 'bg-red-600 hover:bg-red-500' : 'bg-mytemsBlue hover:bg-blue-600'} text-white font-bold text-xs px-3 py-2 rounded transition flex items-center gap-1 shadow">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            <span>ADICIONAR</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* -------------------------------------------------------------
+           CATEGORY FILTERING & SEARCH
+        ------------------------------------------------------------- */
+        function filterCategory(cat) {
+            activeCategory = cat;
+            
+            // Highlight button
+            const buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach(btn => {
+                if (btn.innerText.trim() === cat || (cat === 'ALL' && btn.innerText.trim() === 'TODOS')) {
+                    btn.className = 'cat-btn bg-mytemsBlue text-white px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider transition';
+                } else {
+                    btn.className = 'cat-btn bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider transition';
+                }
+            });
+
+            renderItems();
+        }
+
+        function handleSearch() {
+            renderItems();
+        }
+
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            filterCategory('ALL');
+        }
+
+        /* -------------------------------------------------------------
+           CART SYSTEM
+        ------------------------------------------------------------- */
+        function addToCart(itemId) {
+            const item = currentItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            const existing = cart.find(i => i.id === itemId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...item, qty: 1 });
+            }
+
+            updateCartUI();
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(i => i.id !== itemId);
+            updateCartUI();
+        }
+
+        function changeQty(itemId, delta) {
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCartUI();
+                }
+            }
+        }
+
+        function updateCartUI() {
+            const cartItemsList = document.getElementById('cartItemsList');
+            const cartBadge = document.getElementById('cartBadge');
+            const cartSubtotal = document.getElementById('cartSubtotal');
+            const cartTotal = document.getElementById('cartTotal');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+
+            const totalItemsCount = cart.reduce((acc, i) => acc + i.qty, 0);
+            const totalPrice = cart.reduce((acc, i) => acc + (i.priceEUR * i.qty), 0);
+
+            cartBadge.innerText = totalItemsCount;
+
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = `<p id="emptyCartText" class="text-gray-500 text-sm text-center py-6 font-mono">Seu carrinho está vazio.</p>`;
+                checkoutBtn.disabled = true;
+            } else {
+                checkoutBtn.disabled = false;
+                cartItemsList.innerHTML = cart.map(item => `
+                    <div class="flex items-center justify-between bg-gray-900 p-2 rounded border border-gray-800 text-xs">
+                        <div class="flex-1 pr-2">
+                            <div class="font-bold text-white truncate">${item.name}</div>
+                            <div class="text-emerald-400 font-mono">€ ${item.priceEUR.toFixed(2)}</div>
+                        </div>
+                        <div class="flex items-center gap-1 bg-gray-950 px-2 py-1 rounded border border-gray-800">
+                            <button onclick="changeQty('${item.id}', -1)" class="text-gray-400 hover:text-white px-1">-</button>
+                            <span class="font-mono text-white font-bold">${item.qty}</span>
+                            <button onclick="changeQty('${item.id}', 1)" class="text-gray-400 hover:text-white px-1">+</button>
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 ml-2">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            cartSubtotal.innerText = `€ ${totalPrice.toFixed(2)}`;
+            cartTotal.innerText = `€ ${totalPrice.toFixed(2)}`;
+        }
+
+        /* -------------------------------------------------------------
+           EASTER EGG: TOGGLE DARKNET / MYDRUGS MODE
+        ------------------------------------------------------------- */
+        function toggleDarknetMode() {
+            isDarknetMode = !isDarknetMode;
+
+            const body = document.body;
+            const toggleKnob = document.getElementById('toggleKnob');
+            const toggleBtn = document.getElementById('darknetToggle');
+            const logoText = document.getElementById('logoText');
+            const subTitleText = document.getElementById('subTitleText');
+            const subTitleQuote = document.getElementById('subTitleQuote');
+            const topAccentBar = document.getElementById('topAccentBar');
+            const modeLabel = document.getElementById('modeLabel');
+            const darknetBanner = document.getElementById('darknetBanner');
+            const sectionTitleText = document.getElementById('sectionTitleText');
+            const sectionIcon = document.getElementById('sectionIcon');
+
+            // Glitch visual effect feedback
+            body.classList.add('glitch');
+            setTimeout(() => body.classList.remove('glitch'), 400);
+
+            if (isDarknetMode) {
+                // MYDRUGS MODE
+                currentItems = darknetItems;
+                cart = []; // Reset cart on mode switch
+                updateCartUI();
+
+                toggleKnob.classList.add('translate-x-5');
+                toggleBtn.classList.replace('bg-gray-400', 'bg-red-600');
+                
+                topAccentBar.classList.replace('bg-mytemsOrange', 'bg-red-600');
+                
+                logoText.innerText = 'MYDRUGS';
+                subTitleText.innerText = 'PHARMACEUTICALS & CHEMICALS';
+                subTitleQuote.innerText = '"Don\'t worry, it\'s fully encrypted and shipped via DHL."';
+                modeLabel.innerText = 'Modo Darknet';
+                modeLabel.classList.add('text-red-400');
+
+                darknetBanner.classList.remove('hidden');
+
+                sectionTitleText.innerText = 'Catálogo Criptografado';
+                sectionIcon.className = 'fa-solid fa-user-ninja text-red-500';
+
+                // Category Buttons Transformation
+                document.getElementById('categoryTabs').innerHTML = `
+                    <button onclick="filterCategory('ALL')" class="cat-btn bg-red-600 text-white px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">TODOS</button>
+                    <button onclick="filterCategory('EXTASY')" class="cat-btn bg-gray-800 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">EXTASY</button>
+                    <button onclick="filterCategory('STIMULANTS')" class="cat-btn bg-gray-800 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">ESTIMULANTES</button>
+                    <button onclick="filterCategory('PSYCHEDELICS')" class="cat-btn bg-gray-800 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">PSICODÉLICOS</button>
+                `;
+
+            } else {
+                // MYTEMS STANDARD MODE
+                currentItems = gamingItems;
+                cart = [];
+                updateCartUI();
+
+                toggleKnob.classList.remove('translate-x-5');
+                toggleBtn.classList.replace('bg-red-600', 'bg-gray-400');
+
+                topAccentBar.classList.replace('bg-red-600', 'bg-mytemsOrange');
+
+                logoText.innerText = 'MYTEMS';
+                subTitleText.innerText = 'GAME ITEMS ONLINE HANDELN';
+                subTitleQuote.innerText = '"A maior plataforma europeia de troca de skins e itens virtuais"';
+                modeLabel.innerText = 'Modo Seguro';
+                modeLabel.classList.remove('text-red-400');
+
+                darknetBanner.classList.add('hidden');
+
+                sectionTitleText.innerText = 'Itens em Destaque';
+                sectionIcon.className = 'fa-solid fa-store text-mytemsBlue';
+
+                // Category Buttons Reset
+                document.getElementById('categoryTabs').innerHTML = `
+                    <button onclick="filterCategory('ALL')" class="cat-btn bg-mytemsBlue text-white px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">TODOS</button>
+                    <button onclick="filterCategory('CSGO')" class="cat-btn bg-gray-800 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">CS:GO</button>
+                    <button onclick="filterCategory('TF2')" class="cat-btn bg-gray-800 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">TF2</button>
+                    <button onclick="filterCategory('PUBG')" class="cat-btn bg-gray-800 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">PUBG</button>
+                    <button onclick="filterCategory('RUST')" class="cat-btn bg-gray-800 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">RUST</button>
+                    <button onclick="filterCategory('DOTA2')" class="cat-btn bg-gray-800 px-3 py-1.5 rounded text-sm font-bold uppercase tracking-wider">DOTA 2</button>
+                `;
+            }
+
+            activeCategory = 'ALL';
+            renderItems();
+        }
+
+        /* -------------------------------------------------------------
+           CHECKOUT MODAL LOGIC
+        ------------------------------------------------------------- */
+        function openCheckoutModal() {
+            if (cart.length === 0) return;
+
+            const modal = document.getElementById('checkoutModal');
+            const modalAmount = document.getElementById('modalAmount');
+            const totalPrice = cart.reduce((acc, i) => acc + (i.priceEUR * i.qty), 0);
+
+            // Btc conversion rough approximation
+            const btcValue = (totalPrice * 0.000017).toFixed(5);
+            modalAmount.innerText = `${btcValue} BTC (€ ${totalPrice.toFixed(2)})`;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function processFakePayment() {
+            const btn = document.getElementById('confirmPayBtn');
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Confirmando na Blockchain...`;
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert('Pagamento confirmado com sucesso! O pedido foi enviado para o centro de distribuição em Leipzig.');
+                cart = [];
+                updateCartUI();
+                closeCheckoutModal();
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> CONFIRMAR PAGAMENTO`;
+                btn.disabled = false;
+            }, 1800);
+        }
+    </script>
+</body>
+</html>
